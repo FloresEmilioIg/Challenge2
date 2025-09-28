@@ -5,12 +5,15 @@ import java.io.File;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+/**
+ * Swing-based desktop app to convert JSON files into CSV.
+ */
 public class AppSwing {
-    private static File loadedFile; // para recordar qué JSON se cargó
+    private static File loadedFile; // remembers the loaded JSON file
 
     public static void main(String[] args) {
         JFrame frame = new JFrame("JSON → CSV App");
-        frame.setSize(500, 400);
+        frame.setSize(600, 500);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
 
@@ -18,76 +21,61 @@ public class AppSwing {
         JScrollPane scrollPane = new JScrollPane(textArea);
         frame.add(scrollPane, BorderLayout.CENTER);
 
-        // Botón para cargar JSON
-        JButton btnLoad = new JButton("Cargar JSON");
+        // === Botón: Cargar JSON ===
+        JButton btnLoad = new JButton("Load JSON");
         btnLoad.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();
             int result = fileChooser.showOpenDialog(frame);
             if (result == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
                 try {
-                    // Intentar primero como JSONObject
+                    // Try reading as object
                     try {
                         JSONObject obj = JsonReader.readJsonObject(file.getAbsolutePath());
                         textArea.setText(obj.toString(2));
                         loadedFile = file;
                     } catch (Exception exObj) {
-                        // Si no es objeto, intentar como JSONArray
+                        // Try as array
                         JSONArray arr = JsonReader.readJsonArray(file.getAbsolutePath());
                         textArea.setText(arr.toString(2));
                         loadedFile = file;
                     }
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(frame, "Error leyendo JSON: " + ex.getMessage());
+                    JOptionPane.showMessageDialog(frame, "Error reading JSON: " + ex.getMessage());
                 }
             }
         });
 
-        // Botón para exportar CSV
-        JButton btnSave = new JButton("Exportar CSV");
+        // === Botón: Exportar CSV ===
+        JButton btnSave = new JButton("Export CSV");
         btnSave.addActionListener(e -> {
             if (loadedFile == null) {
-                JOptionPane.showMessageDialog(frame, "Primero carga un archivo JSON.");
+                JOptionPane.showMessageDialog(frame, "Please load a JSON file first.");
                 return;
             }
             try {
                 String[][] data;
 
-                // Intentar como objeto
+                // Try mapping as object
                 try {
                     JSONObject obj = JsonReader.readJsonObject(loadedFile.getAbsolutePath());
-                    data = new String[][]{
-                            {"Nombre", "Edad", "Ciudad"},
-                            {
-                                    obj.getString("nombre"),
-                                    String.valueOf(obj.getInt("edad")),
-                                    obj.getString("ciudad")
-                            }
-                    };
+                    data = JsonToCSVMapper.mapObject(obj);
                 } catch (Exception exObj) {
-                    // Si no es objeto, intentar como array
+                    // Else as array
                     JSONArray arr = JsonReader.readJsonArray(loadedFile.getAbsolutePath());
-                    data = new String[arr.length() + 1][3];
-                    data[0][0] = "Nombre";
-                    data[0][1] = "Edad";
-                    data[0][2] = "Ciudad";
-
-                    for (int i = 0; i < arr.length(); i++) {
-                        JSONObject o = arr.getJSONObject(i);
-                        data[i + 1][0] = o.getString("nombre");
-                        data[i + 1][1] = String.valueOf(o.getInt("edad"));
-                        data[i + 1][2] = o.getString("ciudad");
-                    }
+                    data = JsonToCSVMapper.mapArray(arr);
                 }
 
-                CSVWrite.writeCsv("output.csv", data);
-                JOptionPane.showMessageDialog(frame, "CSV exportado como output.csv");
+                // Use default delimiter (comma)
+                CSVWrite.writeCsv("output.csv", data, ',');
+                JOptionPane.showMessageDialog(frame, "CSV exported as output.csv");
 
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame, "Error exportando CSV: " + ex.getMessage());
+                JOptionPane.showMessageDialog(frame, "Error exporting CSV: " + ex.getMessage());
             }
         });
 
+        // Panel con botones
         JPanel panel = new JPanel();
         panel.add(btnLoad);
         panel.add(btnSave);

@@ -7,16 +7,16 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
- * Clase para leer archivos JSON usando la librería org.json.
+ * Class to transform JSON data into a CSV-compatible structure.
  */
 public class JsonReader {
 
     /**
-     * Lee un archivo JSON y devuelve su contenido como JSONObject.
+     * Reads a JSON file and returns it´s content as JSONObject.
      *
-     * @param filePath Ruta del archivo JSON.
-     * @return JSONObject con los datos del archivo.
-     * @throws IOException si ocurre un error al leer el archivo.
+     * @param filePath Route of the JSON file.
+     * @return JSONObject with the file data.
+     * @throws IOException if an error happens when reading the file.
      */
     public static JSONObject readJsonObject(String filePath) throws IOException {
         try (FileInputStream fis = new FileInputStream(filePath)) {
@@ -30,11 +30,11 @@ public class JsonReader {
     }
 
     /**
-     * Lee un archivo JSON y devuelve su contenido como JSONArray.
+     * Reads a JSON file and returns it´s content as JSONArray.
      *
-     * @param filePath Ruta del archivo JSON.
-     * @return JSONArray con los datos del archivo.
-     * @throws IOException si ocurre un error al leer el archivo.
+     * @param filePath Route of the JSON file.
+     * @return JSONObject with the file data.
+     * @throws IOException if an error happens when reading the file.
      */
     public static JSONArray readJsonArray(String filePath) throws IOException {
         try (FileInputStream fis = new FileInputStream(filePath)) {

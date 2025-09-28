@@ -1,27 +1,31 @@
 import com.opencsv.CSVWriter;
 
+import com.opencsv.CSVWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
 /**
- * Clase para escribir datos en archivos CSV usando OpenCSV.
+ * Utility class for writing data to CSV files using OpenCSV.
  */
 public class CSVWrite {
 
     /**
-     * Escribe datos en un archivo CSV.
+     * Writes data to a CSV file.
      *
-     * @param filePath Ruta del archivo CSV.
-     * @param data     Matriz de Strings que representa filas y columnas.
-     * @throws IOException si ocurre un error al escribir el archivo.
+     * @param filePath  Path of the CSV file.
+     * @param data      2D String array representing rows and columns.
+     * @param delimiter Character used as column delimiter (e.g., ',' or ';').
+     * @throws IOException If an error occurs while writing the file.
      */
-    public static void writeCsv(String filePath, String[][] data) throws IOException {
-        try (CSVWriter writer = new CSVWriter(new FileWriter(filePath))) {
+    public static void writeCsv(String filePath, String[][] data, char delimiter) throws IOException {
+        try (CSVWriter writer = new CSVWriter(new FileWriter(filePath), delimiter,
+                CSVWriter.NO_QUOTE_CHARACTER, CSVWriter.DEFAULT_ESCAPE_CHARACTER,
+                CSVWriter.DEFAULT_LINE_END)) {
             for (String[] row : data) {
                 writer.writeNext(row);
             }
         } catch (IOException e) {
-            throw new IOException("Error al escribir en el archivo CSV: " + filePath, e);
+            throw new IOException("Error writing CSV file: " + filePath, e);
         }
     }
 }
